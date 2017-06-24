@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/25 07:50:15.
+" Last Change: 2017/06/25 08:05:58.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -76,7 +76,7 @@ function! s:save_cmd(text) abort
 endfunction
 
 function! s:save_search(text) abort
-  let text = escape(a:text, '\[]~')
+  let text = '\c' . (a:text =~# '[$.\[\]*~]' ? '\m' : '') . escape(a:text, '\[]~')
   let @/ = text
   call histadd('/', text)
 endfunction
