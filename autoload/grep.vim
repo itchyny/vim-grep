@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/24 23:40:25.
+" Last Change: 2017/06/24 23:44:57.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -13,7 +13,7 @@ function! grep#start(args, line1, line2) abort
   if args ==# ''
     let [orig, args] = s:get_pattern(a:line1 != 1 && a:line2 != line('$'))
     echo 'Grep' orig
-    call s:save_cmd(substitute(escape(orig, '*'), '"', '.', 'g'))
+    call s:save_cmd(substitute(orig, '[$"*]', '.', 'g'))
     call s:save_search(orig, '\[]$*')
   else
     call s:save_search(args, '\[]')
