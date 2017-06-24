@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/24 23:22:21.
+" Last Change: 2017/06/24 23:36:58.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -13,10 +13,10 @@ function! grep#start(args, line1, line2) abort
   if args ==# ''
     let [orig, args] = s:get_pattern(a:line1 != 1 && a:line2 != line('$'))
     echo 'Grep' orig
-    call s:save_cmd(orig)
-    call s:save_search(orig)
+    call s:save_cmd(substitute(escape(orig, '*'), '"', '.', 'g'))
+    call s:save_search(orig, '\[]$*')
   else
-    call s:save_search(args)
+    call s:save_search(args, '\[]')
     let args = s:quote(args)
   endif
   if args ==# ''
@@ -62,8 +62,8 @@ function! s:get_pattern(visual) abort
 endfunction
 
 function! s:normalize_text(text) abort
-  let text = escape(substitute(a:text, '\v^[[:space:][:return:]]+|[[:space:][:return:]]+$|\n.*', '', 'g'), '*')
-  return [text, "'" . substitute(escape(substitute(text, "'", '.', 'g'), '\"[]'), '\\\\\*', '\\*', 'g') . "'"]
+  let text = substitute(a:text, '\v^[[:space:][:return:]]+|[[:space:][:return:]]+$|\n.*', '', 'g')
+  return [text, "'" . escape(substitute(text, "'", '.', 'g'), '\"[]*') . "'"]
 endfunction
 
 function! s:save_cmd(text) abort
@@ -73,8 +73,8 @@ function! s:save_cmd(text) abort
   call histadd(':', 'Grep ' . a:text)
 endfunction
 
-function! s:save_search(text) abort
-  let text = escape(a:text, '\[]')
+function! s:save_search(text, esc) abort
+  let text = escape(a:text, a:esc)
   let @/ = text
   call histadd('/', text)
 endfunction
