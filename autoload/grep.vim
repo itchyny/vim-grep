@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/25 00:26:08.
+" Last Change: 2017/06/25 00:39:34.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -11,22 +11,21 @@ set cpo&vim
 function! grep#start(args, visual) abort
   let [args, dir] = s:extract_target(a:args)
   if args ==# ''
-    let [orig, args] = s:get_pattern(a:visual)
-    echo 'Grep' orig
-    call s:save_cmd(substitute(orig, '[$"*]', '.', 'g'))
-    call s:save_search(orig, '\[]~$*')
-  else
-    call s:save_search(args, '\[]~')
-    let args = s:quote(args)
+    let args = s:get_text(a:visual)
+    if args !=# ''
+      echo 'Grep' args
+      call s:save_cmd(args)
+    endif
   endif
   if args ==# ''
     echo 'Grep: no word to grep'
     return
   endif
+  call s:save_search(args)
   if dir ==# ''
     let dir = s:git_root(expand('%:p:h'))
   endif
-  call s:run(s:get_cmd(dir), dir, args)
+  call s:run(s:get_cmd(dir), dir, s:quote(args))
 endfunction
 
 function! s:extract_target(args) abort
@@ -48,22 +47,20 @@ function! s:resolve_path(path) abort
   return fnamemodify(a:path, ':p')
 endfunction
 
-function! s:get_pattern(visual) abort
+function! s:get_text(visual) abort
+  let text = ''
   if a:visual
     let reg = '"'
     let [save_reg, save_type] = [getreg(reg), getregtype(reg)]
     normal! gv""y
     let text = getreg(reg)
     call setreg(reg, save_reg, save_type)
-    return s:normalize_text(text)
-  else
-    return s:normalize_text(expand('<cword>') !=# '' ? expand('<cword>') : getreg('*') !~# '^\s\+$' ? getreg('*') : '')
+  elseif expand('<cword>') !=# ''
+    let text = expand('<cword>')
+  elseif getreg('*') !~# '^\s\+$'
+    let text = getreg('*')
   endif
-endfunction
-
-function! s:normalize_text(text) abort
-  let text = substitute(a:text, '\v^[[:space:][:return:]]+|[[:space:][:return:]]+$|\n.*', '', 'g')
-  return [text, "'" . escape(substitute(text, "'", '.', 'g'), '\"[]*') . "'"]
+  return substitute(substitute(text, '\v^[[:space:][:return:]]+|[[:space:][:return:]]+$|\n.*', '', 'g'), '[$"*]', '.', 'g')
 endfunction
 
 function! s:save_cmd(text) abort
@@ -73,8 +70,8 @@ function! s:save_cmd(text) abort
   call histadd(':', 'Grep ' . a:text)
 endfunction
 
-function! s:save_search(text, esc) abort
-  let text = escape(a:text, a:esc)
+function! s:save_search(text) abort
+  let text = escape(a:text, '\[]~')
   let @/ = text
   call histadd('/', text)
 endfunction
