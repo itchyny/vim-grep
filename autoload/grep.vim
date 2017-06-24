@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/25 08:05:58.
+" Last Change: 2017/06/25 08:32:03.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -136,11 +136,8 @@ function! s:git_root(dir) abort
     let type = getftype(dir)
     if type ==# 'dir' && isdirectory(dir.'/objects') && isdirectory(dir.'/refs') && getfsize(dir.'/HEAD') > 10
       return fnamemodify(dir, ':h')
-    elseif type ==# 'file'
-      let reldir = get(readfile(dir), 0, '')
-      if reldir =~# '^gitdir: '
-        return fnamemodify(simplify(path . '/' . reldir[8:]), ':h')
-      endif
+    elseif type ==# 'file' && get(readfile(dir), 0, '') =~# '^gitdir: '
+      return fnamemodify(dir, ':h')
     endif
     let prev = path
     let path = fnamemodify(path, ':h')
