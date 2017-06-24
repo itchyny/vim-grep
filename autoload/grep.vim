@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/25 00:39:34.
+" Last Change: 2017/06/25 01:48:38.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -24,6 +24,9 @@ function! grep#start(args, visual) abort
   call s:save_search(args)
   if dir ==# ''
     let dir = s:git_root(expand('%:p:h'))
+    if dir ==# ''
+      let dir = expand('%:p:h')
+    endif
   endif
   call s:run(s:get_cmd(dir), dir, s:quote(args))
 endfunction
@@ -77,10 +80,10 @@ function! s:save_search(text) abort
 endfunction
 
 function! s:get_cmd(dir) abort
-  if !executable('git')
+  let git_root = s:git_root(a:dir)
+  if !executable('git') || git_root ==# ''
     return 'grep --exclude-dir=.git --exclude=tags -HIsinr -- {pat} {dir}'
   endif
-  let git_root = s:git_root(a:dir)
   if git_root ==# s:git_root(getcwd())
     return 'git grep -HIin -- {pat} {dir}'
   endif
@@ -126,7 +129,7 @@ function! s:git_root(dir) abort
     let prev = path
     let path = fnamemodify(path, ':h')
   endwhile
-  return fnamemodify(a:dir, ':p:h')
+  return ''
 endfunction
 
 let &cpo = s:save_cpo
