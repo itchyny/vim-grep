@@ -2,16 +2,16 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/24 23:48:42.
+" Last Change: 2017/06/25 00:14:19.
 " =============================================================================
 
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! grep#start(args, line1, line2) abort
+function! grep#start(args, visual) abort
   let [args, dir] = s:extract_target(a:args)
   if args ==# ''
-    let [orig, args] = s:get_pattern(a:line1 != 1 && a:line2 != line('$'))
+    let [orig, args] = s:get_pattern(a:visual)
     echo 'Grep' orig
     call s:save_cmd(substitute(orig, '[$"*]', '.', 'g'))
     call s:save_search(orig, '\[]~$*')
