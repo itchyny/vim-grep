@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/25 01:48:38.
+" Last Change: 2017/06/25 02:06:09.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -94,7 +94,7 @@ function! s:run(cmd, dir, pat) abort
   let errorformat = &errorformat
   try
     let &errorformat = '%f:%l:%m'
-    let cmd = substitute(s:replace(a:cmd, '{pat}', a:pat), '{dir}', shellescape(a:dir), 'g')
+    let cmd = s:replace(s:replace(a:cmd, '{pat}', a:pat), '{dir}', shellescape(a:dir))
     lexpr system(cmd)
   finally
     let &errorformat = errorformat
@@ -102,7 +102,21 @@ function! s:run(cmd, dir, pat) abort
 endfunction
 
 function! s:replace(str, part, target) abort
-  return join(split(a:str, a:part), a:target)
+  let str = a:str
+  let ret = ''
+  while 1
+    let pos = match(str, a:part)
+    if pos < 0
+      let ret .= str
+      break
+    endif
+    if 0 < pos
+      let ret .= str[:(pos - 1)]
+    endif
+    let ret .= a:target
+    let str = str[(pos + len(a:part)):]
+  endwhile
+  return ret
 endfunction
 
 function! s:quote(pat) abort
