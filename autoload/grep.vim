@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/25 00:14:19.
+" Last Change: 2017/06/25 00:26:08.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -26,7 +26,7 @@ function! grep#start(args, visual) abort
   if dir ==# ''
     let dir = s:git_root(expand('%:p:h'))
   endif
-  call s:run(s:get_cmd(dir), dir, s:quote(args))
+  call s:run(s:get_cmd(dir), dir, args)
 endfunction
 
 function! s:extract_target(args) abort
