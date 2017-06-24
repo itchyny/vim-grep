@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/24 20:38:36.
+" Last Change: 2017/06/24 23:22:21.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -63,7 +63,7 @@ endfunction
 
 function! s:normalize_text(text) abort
   let text = escape(substitute(a:text, '\v^[[:space:][:return:]]+|[[:space:][:return:]]+$|\n.*', '', 'g'), '*')
-  return [text, "'" . escape(substitute(text, "'", '.', 'g'), '\"[]') . "'"]
+  return [text, "'" . substitute(escape(substitute(text, "'", '.', 'g'), '\"[]'), '\\\\\*', '\\*', 'g') . "'"]
 endfunction
 
 function! s:save_cmd(text) abort
