@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/24 23:36:58.
+" Last Change: 2017/06/24 23:40:25.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -42,10 +42,10 @@ function! s:extract_target(args) abort
 endfunction
 
 function! s:resolve_path(path) abort
-  if a:path =~# '\v^\.'
+  if a:path =~# '\v^\.\.?/'
     return fnamemodify(expand('%:p:h') . '/' . a:path, ':p:h')
   endif
-  return fnamemodify(a:path, ':p:h')
+  return fnamemodify(a:path, ':p')
 endfunction
 
 function! s:get_pattern(visual) abort
