@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/25 08:32:03.
+" Last Change: 2017/06/25 12:43:59.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -55,7 +55,7 @@ function! s:get_text(visual) abort
   if a:visual
     let reg = '"'
     let [save_reg, save_type] = [getreg(reg), getregtype(reg)]
-    normal! gv""y
+    silent normal! gv""y
     let text = getreg(reg)
     call setreg(reg, save_reg, save_type)
   elseif expand('<cword>') !=# ''
