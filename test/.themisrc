@@ -1,0 +1,10 @@
+
+function! LoclistText() abort
+  return sort(map(getloclist(0), 'v:val.text'))
+endfunction
+
+function! LoclistBufname(resolve) abort
+  return sort(map(getloclist(0), (a:resolve ? 'resolve' : '') . '(bufname(v:val.bufnr))'))
+endfunction
+
+" vim:ft=vim
