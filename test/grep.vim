@@ -78,6 +78,15 @@ function! s:suite.grep_outside_dir()
   call s:assert.equals(LoclistBufname(1), map(['dir/text2.txt'], 'resolve(s:dir . "/" . v:val)'))
 endfunction
 
+function! s:suite.grep_quoted()
+  Grep 'f[a-z]*$'
+  call s:assert.equals(LoclistText(), ['foo', 'foobar'])
+  call s:assert.equals(histget('/', -1), '\c\mf[a-z]*$')
+  Grep "f[a-z]*$"
+  call s:assert.equals(LoclistText(), ['foo', 'foobar'])
+  call s:assert.equals(histget('/', -1), '\c\mf[a-z]*$')
+endfunction
+
 function! s:suite.grep_cword()
   edit text1.txt
   Grep
