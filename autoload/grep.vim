@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/28 22:17:48.
+" Last Change: 2017/06/28 22:23:55.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -18,10 +18,8 @@ function! grep#start(args, visual) abort
     endif
     echo 'Grep' args
     call s:save_cmd(args)
-    call s:save_search(args, 0)
-  else
-    call s:save_search(args, 1)
   endif
+  call s:save_search(args)
   if dir ==# ''
     let dir = s:git_root(expand('%:p:h'))
     if dir ==# ''
@@ -65,7 +63,7 @@ function! s:get_text(visual) abort
   endif
   let text = substitute(text, '\v^[[:space:][:return:]]+|[[:space:][:return:]]+$|\n.*', '', 'g')
   let text = substitute(text, '\v\s+\zs\S+\s*$', '\=substitute(submatch(0), "[\\/]", ".", "g")', 'g')
-  return substitute(text, '[$"*]', '.', 'g')
+  return substitute(text, '\v[$"*]|^''|''$', '.', 'g')
 endfunction
 
 function! s:save_cmd(text) abort
@@ -75,9 +73,9 @@ function! s:save_cmd(text) abort
   call histadd(':', 'Grep ' . a:text)
 endfunction
 
-function! s:save_search(text, from_arg) abort
+function! s:save_search(text) abort
   let flags = '\c' . (a:text =~# '[$.\[\]*~]' ? '\m' : '')
-  if a:text =~# '\v^(".*"|''.*'')$' && a:from_arg
+  if a:text =~# '\v^(".*"|''.*'')$'
     let text = flags . escape(a:text[1:len(a:text) - 2], '~')
   else
     let text = flags . escape(a:text, '\[]~')
