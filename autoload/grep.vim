@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/25 12:43:59.
+" Last Change: 2017/06/28 22:17:48.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -12,16 +12,16 @@ function! grep#start(args, visual) abort
   let [args, dir] = s:extract_target(a:args)
   if args ==# ''
     let args = s:get_text(a:visual)
-    if args !=# ''
-      echo 'Grep' args
-      call s:save_cmd(args)
+    if args ==# ''
+      echo 'Grep: no word to grep'
+      return
     endif
+    echo 'Grep' args
+    call s:save_cmd(args)
+    call s:save_search(args, 0)
+  else
+    call s:save_search(args, 1)
   endif
-  if args ==# ''
-    echo 'Grep: no word to grep'
-    return
-  endif
-  call s:save_search(args)
   if dir ==# ''
     let dir = s:git_root(expand('%:p:h'))
     if dir ==# ''
@@ -75,8 +75,13 @@ function! s:save_cmd(text) abort
   call histadd(':', 'Grep ' . a:text)
 endfunction
 
-function! s:save_search(text) abort
-  let text = '\c' . (a:text =~# '[$.\[\]*~]' ? '\m' : '') . escape(a:text, '\[]~')
+function! s:save_search(text, from_arg) abort
+  let flags = '\c' . (a:text =~# '[$.\[\]*~]' ? '\m' : '')
+  if a:text =~# '\v^(".*"|''.*'')$' && a:from_arg
+    let text = flags . escape(a:text[1:len(a:text) - 2], '~')
+  else
+    let text = flags . escape(a:text, '\[]~')
+  endif
   let @/ = text
   call histadd('/', text)
 endfunction
