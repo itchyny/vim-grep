@@ -9,7 +9,7 @@ function! s:suite.before()
   call mkdir(dir, 'p')
   cd `=dir`
   let name1 = 'text1.txt'
-  call writefile(['foo', 'bar', 'baz', 'foobar'], name1)
+  call writefile(['foo', 'bar', '^baz''"*[]$', 'foobar'], name1)
   call mkdir('dir', 'p')
   let name2 = 'dir/text2.txt'
   call writefile(['[]!"#$%&''()=^\@*{}+<>~?/`+ ../', ' foobaz qux'], name2)
@@ -107,6 +107,11 @@ function! s:suite.grep_yanked()
 endfunction
 
 function! s:suite.grep_special()
+  edit text1.txt
+  call feedkeys("ggjjV:Grep\<CR>", 'ntx')
+  call s:assert.equals(LoclistText(), ['^baz''"*[]$'])
+  call s:assert.equals(histget('/', -1), '\c\m.baz''..\[\].')
+  call s:assert.equals(histget(':', -1), 'Grep .baz''..[].')
   edit dir/text2.txt
   call feedkeys("ggV:Grep\<CR>", 'ntx')
   call s:assert.equals(LoclistText(), ['[]!"#$%&''()=^\@*{}+<>~?/`+ ../'])

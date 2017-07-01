@@ -10,7 +10,7 @@ function! s:suite.before()
   cd `=dir`
   call system('git init')
   let name1 = 'text1.txt'
-  call writefile(['foo', 'bar', 'baz', 'foobar'], name1)
+  call writefile(['foo', 'bar', '^baz''"*[]$', 'foobar'], name1)
   call system('git add ' . name1)
   call mkdir('dir', 'p')
   let name2 = 'dir/text2.txt'
@@ -111,6 +111,11 @@ function! s:suite.git_grep_yanked()
 endfunction
 
 function! s:suite.git_grep_special()
+  edit text1.txt
+  call feedkeys("ggjjV:Grep\<CR>", 'ntx')
+  call s:assert.equals(LoclistText(), ['^baz''"*[]$'])
+  call s:assert.equals(histget('/', -1), '\c\m.baz''..\[\].')
+  call s:assert.equals(histget(':', -1), 'Grep .baz''..[].')
   edit dir/text2.txt
   call feedkeys("ggV:Grep\<CR>", 'ntx')
   call s:assert.equals(LoclistText(), ['[]!"#$%&''()=^\@*{}+<>~?/`+ ../'])
