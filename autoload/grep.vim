@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/06/28 22:23:55.
+" Last Change: 2017/07/02 07:40:19.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -63,7 +63,7 @@ function! s:get_text(visual) abort
   endif
   let text = substitute(text, '\v^[[:space:][:return:]]+|[[:space:][:return:]]+$|\n.*', '', 'g')
   let text = substitute(text, '\v\s+\zs\S+\s*$', '\=substitute(submatch(0), "[\\/]", ".", "g")', 'g')
-  return substitute(text, '\v[$"*]|^''|''$', '.', 'g')
+  return substitute(text, '\v[$"*]|^''|''$|^\^', '.', 'g')
 endfunction
 
 function! s:save_cmd(text) abort
