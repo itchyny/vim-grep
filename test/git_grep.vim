@@ -8,6 +8,7 @@ function! s:suite.before()
   let s:dir = dir
   call mkdir(dir, 'p')
   cd `=dir`
+  call mkdir('out', 'p')
   call system('git init')
   let name1 = 'text1.txt'
   call writefile(['foo', 'bar', '^baz''"*[]$', 'foobar'], name1)
@@ -16,6 +17,8 @@ function! s:suite.before()
   let name2 = 'dir/text2.txt'
   call writefile(['[]!"#$%&''()=^\@*{}+<>~?/`+ ../', ' foobaz qux'], name2)
   call system('git add ' . name2)
+  let name3 = 'out/text3.txt'
+  call writefile(['foo bar', 'foobaz'], name3)
   set clipboard=unnamed,unnamedplus
 endfunction
 
@@ -80,6 +83,15 @@ function! s:suite.git_grep_outside_dir()
   execute 'Grep foo' s:dir . '/dir'
   call s:assert.equals(LoclistText(), [' foobaz qux'])
   call s:assert.equals(LoclistBufname(0), map(['dir/text2.txt'], 's:dir . "/" . v:val'))
+endfunction
+
+function! s:suite.git_grep_non_tracked()
+  lcd out
+  Grep foo ../
+  call s:assert.equals(LoclistText(), [' foobaz qux', 'foo', 'foobar'])
+  call s:assert.equals(LoclistBufname(0), ['../dir/text2.txt', '../text1.txt', '../text1.txt'])
+  Grep foo ../out
+  call s:assert.equals(LoclistText(), ['foo bar', 'foobaz'])
 endfunction
 
 function! s:suite.git_grep_quoted()
