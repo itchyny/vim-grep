@@ -70,6 +70,7 @@ function! s:suite.git_grep_parent()
   Grep foo ../
   call s:assert.equals(LoclistText(), [' foobaz qux', 'foo', 'foobar'])
   call s:assert.equals(LoclistBufname(0), ['../text1.txt', '../text1.txt', 'text2.txt'])
+  lcd `=s:dir . '/dir'`
   Grep foo ../dir
   call s:assert.equals(LoclistText(), [' foobaz qux'])
   call s:assert.equals(LoclistBufname(0), ['text2.txt'])
