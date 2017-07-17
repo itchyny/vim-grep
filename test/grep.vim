@@ -63,9 +63,6 @@ function! s:suite.grep_parent()
   lcd dir
   Grep foo ../
   call s:assert.equals(LoclistText(), [' foobaz qux', 'foo', 'foobar'])
-  Grep foo ../dir
-  call s:assert.equals(LoclistText(), [' foobaz qux'])
-  call s:assert.equals(LoclistBufname(1), map(['dir/text2.txt'], 'resolve(s:dir . "/" . v:val)'))
 endfunction
 
 function! s:suite.grep_outside_dir()
