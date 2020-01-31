@@ -1,4 +1,4 @@
-# vim-grep
+# vim-grep [![CI Status](https://github.com/itchyny/vim-grep/workflows/CI/badge.svg)](https://github.com/itchyny/vim-grep/actions)
 Example configuration
 ```vim
 nnoremap gr :<C-u>Grep<Space>
