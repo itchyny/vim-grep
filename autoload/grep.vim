@@ -2,7 +2,7 @@
 " Filename: autoload/grep.vim
 " Author: itchyny
 " License: MIT License
-" Last Change: 2017/07/14 22:24:57.
+" Last Change: 2025/05/20 21:40:53.
 " =============================================================================
 
 let s:save_cpo = &cpo
@@ -19,14 +19,15 @@ function! grep#start(args, visual) abort
     echo 'Grep' args
     call s:save_cmd(args)
   endif
-  call s:save_search(args)
+  let [opts, args] = matchlist(args, '\v^(%(-\a\s+)*)(.*)$')[1:2]
+  call s:save_search(args, opts =~# '-E')
   if dir ==# ''
     let dir = s:git_root(expand('%:p:h'))
     if dir ==# ''
       let dir = expand('%:p:h')
     endif
   endif
-  call s:run(s:get_cmd(dir), dir, s:quote(args))
+  call s:run(s:get_cmd(opts, dir), dir, s:quote(args))
 endfunction
 
 function! s:extract_target(args) abort
@@ -73,8 +74,8 @@ function! s:save_cmd(text) abort
   call histadd(':', 'Grep ' . a:text)
 endfunction
 
-function! s:save_search(text) abort
-  let flags = '\c' . (a:text =~# '[$.\[\]*~]' ? '\m' : '')
+function! s:save_search(text, magic) abort
+  let flags = '\c' . (a:magic ? '\v' : a:text =~# '[$.\[\]*~]' ? '\m' : '')
   if a:text =~# '\v^(".*"|''.*'')$'
     let text = flags . escape(a:text[1:len(a:text) - 2], '~')
   else
@@ -84,15 +85,15 @@ function! s:save_search(text) abort
   call histadd('/', text)
 endfunction
 
-function! s:get_cmd(dir) abort
+function! s:get_cmd(opts, dir) abort
   let git_root = s:git_root(a:dir)
   if !executable('git') || git_root ==# '' || !s:git_tracked(a:dir, git_root)
-    return 'grep --exclude-dir=.git --exclude=tags -HIsinr -- {pat} {dir}'
+    return 'grep --exclude-dir=.git --exclude=tags -HIsinr ' . a:opts . '-- {pat} {dir}'
   endif
   if git_root ==# s:git_root(getcwd())
-    return 'git grep -HIin -- {pat} {dir}'
+    return 'git grep -HIin ' . a:opts . '-- {pat} {dir}'
   endif
-  return 'git -C ' . shellescape(git_root) . ' grep -HIin -- {pat} {dir} | sed "s|^|' . escape(git_root, ' ') . '/|"'
+  return 'git -C ' . shellescape(git_root) . ' grep -HIin ' . a:opts . '-- {pat} {dir} | sed "s|^|' . escape(git_root, ' ') . '/|"'
 endfunction
 
 function! s:git_tracked(dir, git_root) abort

@@ -103,6 +103,12 @@ function! s:suite.git_grep_quoted()
   call s:assert.equals(histget('/', -1), '\c\mf[a-z]*$')
 endfunction
 
+function! s:suite.git_grep_extended()
+  Grep -E '^(foo|bar)+$'
+  call s:assert.equals(LoclistText(), ['bar', 'foo', 'foobar'])
+  call s:assert.equals(histget('/', -1), '\c\v^(foo|bar)+$')
+endfunction
+
 function! s:suite.git_grep_cword()
   edit text1.txt
   Grep
