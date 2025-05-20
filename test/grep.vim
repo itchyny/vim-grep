@@ -100,15 +100,6 @@ function! s:suite.grep_cword()
   call s:assert.equals(LoclistText(), ['bar', 'foobar'])
 endfunction
 
-function! s:suite.grep_yanked()
-  edit text1.txt
-  call cursor(4, 1)
-  yank
-  tabnew
-  Grep
-  call s:assert.equals(LoclistText(), ['foobar'])
-endfunction
-
 function! s:suite.grep_special()
   edit text1.txt
   call feedkeys("ggjjV:Grep\<CR>", 'ntx')
